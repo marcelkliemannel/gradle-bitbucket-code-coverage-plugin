@@ -20,7 +20,7 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-params:$jUnitVersion")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-  testImplementation("org.jetbrains:annotations:23.0.0")
+  testImplementation("org.assertj:assertj-core:3.11.1")
 }
 
 tasks.getByName<Test>("test") {

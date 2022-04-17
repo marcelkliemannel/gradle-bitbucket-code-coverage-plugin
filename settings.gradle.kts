@@ -1,2 +1,2 @@
-rootProject.name = "bitbucket-code-coverage"
+rootProject.name = "gradle-bitbucket-code-coverage-plugin"
 

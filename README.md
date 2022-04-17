@@ -1,0 +1,1 @@
+# Gradle Bitbucket Code Coverage Plugin
