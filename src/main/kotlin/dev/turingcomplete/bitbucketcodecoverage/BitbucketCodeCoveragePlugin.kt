@@ -10,6 +10,22 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 
 class BitbucketCodeCoveragePlugin : Plugin<Project> {
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+    fun configureBitbucketApiPropertiesFromExtension(task: PublishCodeCoverageToBitbucketTask,
+                                                     extension: PublishCodeCoverageToBitbucketExtension) {
+
+      task.bitbucketApiHost.set(extension.bitbucketApiHost)
+      task.bitbucketApiUser.set(extension.bitbucketApiUser)
+      task.bitbucketApiPassword.set(extension.bitbucketApiPassword)
+      task.bitbucketApiToken.set(extension.bitbucketApiToken)
+      task.bitbucketApiTimeout.set(extension.bitbucketApiTimeout)
+      task.bitbucketCommitId.set(extension.bitbucketCommitId)
+      task.bitbucketProjectKey.set(extension.bitbucketProjectKey)
+      task.bitbucketRepositorySlug.set(extension.bitbucketRepositorySlug)
+    }
+  }
+
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -29,7 +45,7 @@ class BitbucketCodeCoveragePlugin : Plugin<Project> {
   private fun configurePublishJacocoCodeCoverageToBitbucketTask(project: Project, extension: PublishCodeCoverageToBitbucketExtension) {
     project.tasks.register(PublishJacocoCodeCoverageToBitbucketTask.TASK_NAME, PublishJacocoCodeCoverageToBitbucketTask::class.java) {
       // Configure PublishCodeCoverageToBitbucketTask
-      configureBitbucketApiProperties(it, extension)
+      configureBitbucketApiPropertiesFromExtension(it, extension)
       configureSourceFilesSearchDirs(it, extension, project)
 
       // Configure PublishJacocoCodeCoverageToBitbucketTask
@@ -58,19 +74,6 @@ class BitbucketCodeCoveragePlugin : Plugin<Project> {
       }
       task.sourceFilesSearchDirs.from(foo)
     }
-  }
-
-  private fun configureBitbucketApiProperties(task: PublishCodeCoverageToBitbucketTask,
-                                              extension: PublishCodeCoverageToBitbucketExtension) {
-
-    task.bitbucketApiHost.set(extension.bitbucketApiHost)
-    task.bitbucketApiUser.set(extension.bitbucketApiUser)
-    task.bitbucketApiPassword.set(extension.bitbucketApiPassword)
-    task.bitbucketApiToken.set(extension.bitbucketApiToken)
-    task.bitbucketApiTimeout.set(extension.bitbucketApiTimeout)
-    task.bitbucketCommitId.set(extension.bitbucketCommitId)
-    task.bitbucketProjectKey.set(extension.bitbucketProjectKey)
-    task.bitbucketRepositorySlug.set(extension.bitbucketProjectSlug)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

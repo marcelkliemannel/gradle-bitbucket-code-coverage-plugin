@@ -3,6 +3,7 @@ package dev.turingcomplete.bitbucketcodecoverage
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -18,8 +19,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.time.Duration
 import java.util.*
 
-
-abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
+open class PublishCodeCoverageToBitbucketTask : DefaultTask() {
   // -- Companion Object -------------------------------------------------------------------------------------------- //
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -27,22 +27,22 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
    * The host address to the Bitbucket API (e.g., `https://bitbucket.inc.com`).
    */
   @get:Input
-  abstract val bitbucketApiHost: Property<String>
+  val bitbucketApiHost: Property<String>
 
   @get:[Optional Input]
-  abstract val bitbucketApiUser: Property<String>
+  val bitbucketApiUser: Property<String>
 
   @get:[Optional Input]
-  abstract val bitbucketApiPassword: Property<String>
+  val bitbucketApiPassword: Property<String>
 
   @get:[Optional Input]
-  abstract val bitbucketApiToken: Property<String>
+  val bitbucketApiToken: Property<String>
 
   /**
    * The request timeout for the Bitbucket API. The default value is 30 seconds.
    */
   @get:[Optional Input]
-  abstract val bitbucketApiTimeout: Property<Duration>
+  val bitbucketApiTimeout: Property<Duration>
 
   /**
    * The project key to which the [bitbucketRepositorySlug] belongs.
@@ -50,7 +50,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
    * If this property is set, [bitbucketRepositorySlug] must also be set.
    */
   @get:[Optional Input]
-  abstract val bitbucketProjectKey: Property<String>
+  val bitbucketProjectKey: Property<String>
 
   /**
    * The repository to which the [bitbucketCommitId] belongs.
@@ -58,7 +58,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
    * If this property is set, [bitbucketProjectKey] must also be set.
    */
   @get:[Optional Input]
-  abstract val bitbucketRepositorySlug: Property<String>
+  val bitbucketRepositorySlug: Property<String>
 
   /**
    * The Git commit ID to which the published code coverage should be associated.
@@ -68,18 +68,32 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
    * have a commit with this ID.
    */
   @get:Input
-  abstract val bitbucketCommitId: Property<String>
+  val bitbucketCommitId: Property<String>
 
   /**
    *
    */
   @get:InputFiles
-  abstract val sourceFilesSearchDirs: ConfigurableFileCollection
+  val sourceFilesSearchDirs: ConfigurableFileCollection
+
+  @get:Input
+  val classCodeCoverages: ListProperty<ClassCodeCoverage>
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    @Suppress("LeakingThis")
+    val objects = project.objects
+    bitbucketApiHost = objects.property(String::class.java)
+    bitbucketApiUser = objects.property(String::class.java)
+    bitbucketApiPassword = objects.property(String::class.java)
+    bitbucketApiToken = objects.property(String::class.java)
+    bitbucketApiTimeout = objects.property(Duration::class.java)
+    bitbucketProjectKey = objects.property(String::class.java)
+    bitbucketRepositorySlug = objects.property(String::class.java)
+    bitbucketCommitId = objects.property(String::class.java)
+    sourceFilesSearchDirs = objects.fileCollection()
+    classCodeCoverages = objects.listProperty(ClassCodeCoverage::class.java)
+
     bitbucketApiTimeout.convention(Duration.ofSeconds(30))
   }
 
@@ -87,14 +101,15 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
 
   @TaskAction
   fun publish() {
-    val classCodeCoverages = collectClassCodeCoverages().ifEmpty { return }
+    val classCodeCoverages = classCodeCoverages.get().ifEmpty {
+      logger.info("No code coverages available which can be published to Bitbucket.")
+      return
+    }
 
     findSourceFileMappings(classCodeCoverages)
 
     sendToBitbucketApi(classCodeCoverages)
   }
-
-  abstract fun collectClassCodeCoverages(): List<ClassCodeCoverage>
 
   /**
    * Creates a [HttpClient] that gets used to communicate with the Bitbucket API.
@@ -124,7 +139,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
       request.header("Authorization", "Basic ${Base64.getEncoder().encodeToString("${bitbucketApiUser.get()}:${bitbucketApiPassword.get()}".toByteArray())}")
     }
     else if (bitbucketApiToken.isPresent) {
-      request.header("Authorization", "Bearer ${bitbucketApiToken.isPresent}")
+      request.header("Authorization", "Bearer ${bitbucketApiToken.get()}")
     }
 
     return request.build()
@@ -154,7 +169,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun sendToBitbucketApi(classCodeCoverages: List<ClassCodeCoverage>) {
-    logger.debug("Sending code coverage to Bitbucket...")
+    logger.info("Sending code coverage to Bitbucket...")
 
     val jsonRepresentation = createBitbucketApiJsonRepresentation(classCodeCoverages)
     val request = createPublishBitbucketCodeCoverageRequest(jsonRepresentation)
@@ -171,19 +186,18 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
     val rootProjectDir = project.rootProject.rootDir.toPath()
 
     return """
-      {
-        "files": [
-          ${classCodeCoverages.filter { it.sourceFile != null }.joinToString(",\n") {
-      """
-          {
-            "path": "${rootProjectDir.relativize(it.sourceFile!!)}",
-            "coverage": "${it.toBitbucketCodeCoverage()}"
-          }
-          """.trim()
-    }}
-        ]
-      }
-    """.trimIndent()
+{
+  "files": [
+    |${classCodeCoverages.filter { it.sourceFile != null }.joinToString(",\n") {
+    """
+    {
+      "path": "${rootProjectDir.relativize(it.sourceFile!!)}",
+      "coverage": "${it.toBitbucketCodeCoverage()}"
+    }
+    """.trimMargin() }}
+  ]
+}
+""".trimMargin()
   }
 
   /**

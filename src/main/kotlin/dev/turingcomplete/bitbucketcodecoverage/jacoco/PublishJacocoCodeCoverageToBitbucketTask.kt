@@ -9,7 +9,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 
-abstract class PublishJacocoCodeCoverageToBitbucketTask : PublishCodeCoverageToBitbucketTask() {
+open class PublishJacocoCodeCoverageToBitbucketTask : PublishCodeCoverageToBitbucketTask() {
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {
@@ -19,21 +19,26 @@ abstract class PublishJacocoCodeCoverageToBitbucketTask : PublishCodeCoverageToB
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   @get:InputFiles
-  abstract val jacocoXmlCoverageReports: ConfigurableFileCollection
+  val jacocoXmlCoverageReports: ConfigurableFileCollection
 
   @get:[Input Optional]
-  abstract val skipOnMissingJacocoXmlCoverageReports: Property<Boolean>
+  val skipOnMissingJacocoXmlCoverageReports: Property<Boolean>
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    @Suppress("LeakingThis")
+    val objects = project.objects
+    jacocoXmlCoverageReports = objects.fileCollection()
+    skipOnMissingJacocoXmlCoverageReports = objects.property(Boolean::class.java)
+
     skipOnMissingJacocoXmlCoverageReports.convention(false)
+    classCodeCoverages.convention(project.provider { collectClassCodeCoverages() })
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  override fun collectClassCodeCoverages(): List<ClassCodeCoverage> {
+  private fun collectClassCodeCoverages(): List<ClassCodeCoverage> {
     val convertibleJacocoReports = jacocoXmlCoverageReports.filter { JacocoXmlReportConverter.isReportConvertible(it) }
     if (convertibleJacocoReports.isEmpty && !skipOnMissingJacocoXmlCoverageReports.get()) {
       throw GradleException("""There are no JaCoCo reports available which can be converted.
@@ -53,6 +58,5 @@ abstract class PublishJacocoCodeCoverageToBitbucketTask : PublishCodeCoverageToB
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 }

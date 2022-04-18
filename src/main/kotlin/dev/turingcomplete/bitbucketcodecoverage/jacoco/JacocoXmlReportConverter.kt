@@ -20,16 +20,26 @@ object JacocoXmlReportConverter {
   fun convertReport(file: File): List<ClassCodeCoverage> {
     assert(isReportConvertible(file))
 
-    return readXmlReportFile(file)
-            .getElementsByTagName("package")
+    val packageElements = mutableListOf<Element>()
+
+    // Read packages from children of 'group' elements
+    readXmlReportFile(file)
+            .getElementsByTagName("group")
             .toElementSequence()
-            .flatMap(collectPackageCoverage())
-            .toList()
+            .flatMap { it.getElementsByTagName("package").toElementSequence() }
+            .forEach { packageElements.add(it) }
+
+    // Read packages from first level 'package' elements
+    readXmlReportFile(file)
+            .getElementsByTagName("package").toElementSequence()
+            .forEach { packageElements.add(it) }
+
+    return packageElements.flatMap(collectPackageCoverage()).toList()
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun collectPackageCoverage() : (Element) -> Sequence<ClassCodeCoverage> {
+  private fun collectPackageCoverage(): (Element) -> Sequence<ClassCodeCoverage> {
     return { packageElement ->
       val packageName = packageElement.getAttribute("name").replace("/", ".")
 

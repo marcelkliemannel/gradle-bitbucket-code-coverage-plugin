@@ -30,7 +30,7 @@ open class PublishCodeCoverageToBitbucketExtension @Inject constructor(objects: 
 
   val bitbucketProjectKey: Property<String>
 
-  val bitbucketProjectSlug: Property<String>
+  val bitbucketRepositorySlug: Property<String>
 
   val sourceFilesSearchDirs: ConfigurableFileCollection
 
@@ -46,7 +46,7 @@ open class PublishCodeCoverageToBitbucketExtension @Inject constructor(objects: 
     bitbucketApiTimeout = objects.property(Duration::class.java)
     bitbucketCommitId = objects.property(String::class.java)
     bitbucketProjectKey = objects.property(String::class.java)
-    bitbucketProjectSlug = objects.property(String::class.java)
+    bitbucketRepositorySlug = objects.property(String::class.java)
     sourceFilesSearchDirs = objects.fileCollection()
     jacoco = objects.newInstance(PublishJacocoCodeCoverageToBitbucketExtension::class.java)
   }
