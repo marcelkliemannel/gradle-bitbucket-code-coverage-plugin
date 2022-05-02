@@ -1,7 +1,9 @@
 package dev.turingcomplete.gradlebitbucketcodecoverageplugin.jacoco
 
 import dev.turingcomplete.bitbucketcodecoverage.jacoco.PublishJacocoCodeCoverageToBitbucketTask
+import dev.turingcomplete.gradlebitbucketcodecoverageplugin.__helper.BitbucketApiRequest
 import dev.turingcomplete.gradlebitbucketcodecoverageplugin.__helper.MockBitbucketServer
+import dev.turingcomplete.gradlebitbucketcodecoverageplugin.__helper.TestProject
 import dev.turingcomplete.gradlebitbucketcodecoverageplugin.__helper.TestProject.configureSubProjects
 import dev.turingcomplete.gradlebitbucketcodecoverageplugin.__helper.TestProject.createTestProject
 import org.assertj.core.api.Assertions.assertThat
@@ -45,16 +47,12 @@ class PublishJacocoCodeCoverageToBitbucketTaskTest {
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   @Test
-  fun `Test single project code coverage send to Bitbucket API`() {
+  fun `Test parsing of JaCoCo XML reports`() {
     configureSubProjects(testProjectDir, """
       bitbucketCodeCoverage {
-        bitbucketApiHost.set("${mockBitbucketServer.getHost()}")
-        bitbucketApiTimeout.set(Duration.ofSeconds(5))
+        bitbucketHost.set("${mockBitbucketServer.getHost()}")
+        bitbucketTimeout.set(Duration.ofSeconds(5))
         bitbucketCommitId.set("12345")
-      }
-      
-      tasks.jacocoTestReport {
-        reports.xml.required.set(true)
       }
     """.trimIndent())
 
@@ -63,10 +61,7 @@ class PublishJacocoCodeCoverageToBitbucketTaskTest {
             .forwardOutput()
             .build()
 
-    val receivedRequest = mockBitbucketServer.getSingleReceivedRequest()
-    assertThat(receivedRequest.requestPath).isEqualTo("/bitbucket/rest/code-coverage/1.0/commits/12345")
-    assertThat(receivedRequest.requestMethod).isEqualTo("POST")
-    assertThat(receivedRequest.requestBody).isEqualTo("""
+    val expectedRequests = listOf(BitbucketApiRequest("/bitbucket/rest/code-coverage/1.0/commits/12345", "POST", """
       {
         "files": [
           {
@@ -79,10 +74,24 @@ class PublishJacocoCodeCoverageToBitbucketTaskTest {
           }
         ]
       }
-    """.trimIndent())
+    """.trimIndent()), BitbucketApiRequest("/bitbucket/rest/code-coverage/1.0/commits/12345", "POST", """
+      {
+        "files": [
+          {
+            "path": "sub-project-2/src/main/kotlin/KotlinClass.kt",
+            "coverage": "C:1,15,16,17,21,26,34,39,47,49,50;P:20;U:4,7,8,11,12,24,29,30,31,36,37,41,43,44"
+          }
+        ]
+      }
+    """.trimIndent()))
+    val actualRequests = mockBitbucketServer.getReceivedRequests()
+    assertThat(actualRequests).containsExactlyElementsOf(expectedRequests)
 
-    assertThat(result.task(":sub-project-1:${PublishJacocoCodeCoverageToBitbucketTask.TASK_NAME}")?.outcome)
-            .isEqualTo(TaskOutcome.SUCCESS)
+    // Expect all publishJacocoCodeCoverageToBitbucket tasks to have succeeded
+    TestProject.SUB_PROJECT_NAMES.forEach {
+      assertThat(result.task(":$it:${PublishJacocoCodeCoverageToBitbucketTask.TASK_NAME}")?.outcome)
+              .isEqualTo(TaskOutcome.SUCCESS)
+    }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

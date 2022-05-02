@@ -1,12 +1,15 @@
 package dev.turingcomplete.bitbucketcodecoverage
 
 import dev.turingcomplete.bitbucketcodecoverage.jacoco.PublishJacocoCodeCoverageToBitbucketExtension
-import org.gradle.api.file.ConfigurableFileCollection
+import dev.turingcomplete.bitbucketcodecoverage.jacoco.PublishJacocoCodeCoverageToBitbucketTask
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import java.time.Duration
 import javax.inject.Inject
 
+/**
+ * Extension to configure a [PublishCodeCoverageToBitbucketTask].
+ */
 open class PublishCodeCoverageToBitbucketExtension @Inject constructor(objects: ObjectFactory) {
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
@@ -16,38 +19,80 @@ open class PublishCodeCoverageToBitbucketExtension @Inject constructor(objects: 
 
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  val bitbucketApiHost: Property<String>
+  /**
+   * The host address of Bitbucket (e.g., `https://mybitbucket.com`).
+   *
+   * Must start with `http://` or `https://`.
+   */
+  val bitbucketHost: Property<String>
 
-  val bitbucketApiUser: Property<String>
+  /**
+   * A Bitbucket user for the authentication.
+   *
+   * Must be set in conjunction with [bitbucketPassword].
+   */
+  val bitbucketUser: Property<String>
 
-  val bitbucketApiPassword: Property<String>
+  /**
+   * The password of the [bitbucketUser].
+   *
+   * Must be set in conjunction with [bitbucketUser].
+   */
+  val bitbucketPassword: Property<String>
 
-  val bitbucketApiToken: Property<String>
+  /**
+   * A token to use for authentication as an alternative to the user/password
+   * authentication.
+   *
+   * The value will be ignored if [bitbucketUser] is set.
+   */
+  val bitbucketToken: Property<String>
 
-  val bitbucketApiTimeout: Property<Duration>
+  /**
+   * The timeout of any request to Bitbucket. The default value is 30 seconds.
+   */
+  val bitbucketTimeout: Property<Duration>
 
+  /**
+   * The Git commit ID to which the published code coverage should be associated.
+   *
+   * If [bitbucketProjectKey] and [bitbucketRepositorySlug] is not set,
+   * Bitbucket will add the code coverage to all repositories which have a
+   * commit with this ID.
+   */
   val bitbucketCommitId: Property<String>
 
+  /**
+   * A Bitbucket project key.
+   *
+   * Must be set in conjunction with [bitbucketRepositorySlug].
+   */
   val bitbucketProjectKey: Property<String>
 
+  /**
+   * A repository slug.
+   *
+   * Must be set in conjunction with [bitbucketProjectKey].
+   */
   val bitbucketRepositorySlug: Property<String>
 
-  val sourceFilesSearchDirs: ConfigurableFileCollection
-
+  /**
+   * An instance of the [PublishJacocoCodeCoverageToBitbucketExtension] to
+   * configure the [PublishJacocoCodeCoverageToBitbucketTask].
+   */
   val jacoco: PublishJacocoCodeCoverageToBitbucketExtension
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    bitbucketApiHost = objects.property(String::class.java)
-    bitbucketApiUser = objects.property(String::class.java)
-    bitbucketApiPassword = objects.property(String::class.java)
-    bitbucketApiToken = objects.property(String::class.java)
-    bitbucketApiTimeout = objects.property(Duration::class.java)
+    bitbucketHost = objects.property(String::class.java)
+    bitbucketUser = objects.property(String::class.java)
+    bitbucketPassword = objects.property(String::class.java)
+    bitbucketToken = objects.property(String::class.java)
+    bitbucketTimeout = objects.property(Duration::class.java)
     bitbucketCommitId = objects.property(String::class.java)
     bitbucketProjectKey = objects.property(String::class.java)
     bitbucketRepositorySlug = objects.property(String::class.java)
-    sourceFilesSearchDirs = objects.fileCollection()
     jacoco = objects.newInstance(PublishJacocoCodeCoverageToBitbucketExtension::class.java)
   }
 

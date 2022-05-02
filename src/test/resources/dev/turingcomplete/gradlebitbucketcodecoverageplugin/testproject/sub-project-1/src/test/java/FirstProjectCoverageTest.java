@@ -1,7 +1,7 @@
 import org.junit.jupiter.api.Test;
 import firstPackage.secondPackage.ClassWithPackage;
 
-class CoverageTest {
+class FirstProjectCoverageTest {
     @Test
     void test() {
         var classWithoutPackage = new ClassWithoutPackage();

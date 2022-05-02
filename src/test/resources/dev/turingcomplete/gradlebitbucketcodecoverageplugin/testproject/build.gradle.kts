@@ -1,3 +1,6 @@
+import dev.turingcomplete.bitbucketcodecoverage.FileCodeCoverage
+import dev.turingcomplete.bitbucketcodecoverage.PublishCodeCoverageToBitbucketExtension
+import dev.turingcomplete.bitbucketcodecoverage.PublishCodeCoverageToBitbucketTask
 import java.time.Duration
 
 plugins {
@@ -32,10 +35,9 @@ subprojects {
   tasks.jacocoTestReport {
     dependsOn(tasks.test)
   }
+}
 
-  bitbucketCodeCoverage {
-    bitbucketApiHost.set("http://localhost")
-  }
+// %placeholderForModifications%
 
-  // %placeholderForModifications%
+class TestPublishCodeCoverageToBitbucketTask : PublishCodeCoverageToBitbucketTask() {
 }
