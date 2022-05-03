@@ -30,7 +30,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
   /**
    * The host address to Bitbucket (e.g., `https://bitbucket.inc.com`).
    *
-   * Must start with
+   * Must start with `https://` or `http://`.
    */
   @get:Input
   val bitbucketHost: Property<String>
@@ -132,7 +132,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
    *
    * @return an [HttpClient] for the communication with Bitbucket.
    */
-  open fun createBitbucketApiHttpClient(): HttpClient {
+  open fun createBitbucketHttpClient(): HttpClient {
     return HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .build()
@@ -219,7 +219,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
       val request = createPublishBitbucketCodeCoverageRequest(jsonRepresentation)
       logger.debug("Using Bitbucket URI: ${request.uri()}")
 
-      createBitbucketApiHttpClient().send(request, BodyHandlers.ofString())
+      createBitbucketHttpClient().send(request, BodyHandlers.ofString())
     }
     catch (e: Exception) {
       throw GradleException("Failed to send code coverage to Bitbucket.", e)
