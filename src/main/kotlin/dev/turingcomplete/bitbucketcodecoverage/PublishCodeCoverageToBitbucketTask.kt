@@ -170,7 +170,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
       // Append trailing slash to host if it is not present yet
       append(bitbucketHost.get().replace(Regex("/?$"), "/"))
 
-      append("bitbucket/rest/code-coverage/1.0/")
+      append("rest/code-coverage/1.0/")
 
       if (bitbucketProjectKey.isPresent && bitbucketRepositorySlug.isPresent) {
         append("projects/${bitbucketProjectKey.get()}/repos/${bitbucketRepositorySlug.get()}/")
@@ -210,7 +210,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
 
     // Send request
     val response = try {
-      logger.info("Sending code coverage for ${fileCodeCoverages.size} files to Bitbucket...")
+      logger.info("Sending code coverage for ${fileCodeCoverages.size} file(s) to Bitbucket...")
 
       val jsonRepresentation = createBitbucketFileCoveragesJson(fileCodeCoverages)
       logger.debug("The following Bitbucket code coverage will be send:\n${jsonRepresentation}")
@@ -227,11 +227,11 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
     // Check response
     if (project.logger.isDebugEnabled) {
       val headersAsText = response.headers().map().map { "- ${it.key}: ${it.value.joinToString()}" }.joinToString("\n")
-      logger.debug("Bitbucket responded with status code ${response.statusCode()} and headers:\n$headersAsText")
+      logger.debug("Bitbucket responded with status code ${response.statusCode()}, headers:\n$headersAsText\n\nand body:\n${response.body()}")
     }
     
     if (response.statusCode() !in (200..299)) {
-      throw GradleException("Bitbucket responded with the unexpected status code ${response.statusCode()}${if (response.body().isNotBlank()) " and body:\n${response.body()}" else "."}")
+      throw GradleException("Bitbucket responded with the unexpected status code ${response.statusCode()} and body:\n${response.body()}")
     }
 
     logger.info("Code coverage was sent to Bitbucket.")
