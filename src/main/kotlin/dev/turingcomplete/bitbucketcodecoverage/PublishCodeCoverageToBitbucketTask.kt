@@ -118,13 +118,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
   @TaskAction
   fun publish() {
     validateTaskProperties()
-
-    val classCodeCoverages = fileCodeCoverages.get().ifEmpty {
-      logger.warn("There are no code coverages available which can be published to Bitbucket.")
-      return
-    }
-
-    publishCodeCoverageToBitbucketApi(classCodeCoverages)
+    publishCodeCoverageToBitbucketApi(fileCodeCoverages.get())
   }
 
   /**
@@ -209,6 +203,11 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
   }
 
   private fun publishCodeCoverageToBitbucketApi(fileCodeCoverages: List<FileCodeCoverage>) {
+    if (fileCodeCoverages.isEmpty()) {
+      logger.warn("There are no code coverages available which can be published to Bitbucket.")
+      return
+    }
+
     // Send request
     val response = try {
       logger.info("Sending code coverage for ${fileCodeCoverages.size} files to Bitbucket...")
@@ -226,6 +225,11 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
     }
 
     // Check response
+    if (project.logger.isDebugEnabled) {
+      val headersAsText = response.headers().map().map { "- ${it.key}: ${it.value.joinToString()}" }.joinToString("\n")
+      logger.debug("Bitbucket responded with status code ${response.statusCode()} and headers:\n$headersAsText")
+    }
+    
     if (response.statusCode() !in (200..299)) {
       throw GradleException("Bitbucket responded with the unexpected status code ${response.statusCode()}${if (response.body().isNotBlank()) " and body:\n${response.body()}" else "."}")
     }

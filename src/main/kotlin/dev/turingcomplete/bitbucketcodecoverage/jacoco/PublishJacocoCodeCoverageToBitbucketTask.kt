@@ -29,26 +29,26 @@ open class PublishJacocoCodeCoverageToBitbucketTask : PublishCodeCoverageToBitbu
 
     private val MISSING_REPORT_ERROR_MESSAGE: String = """There are no JaCoCo XML reports available which can be converted.
   
-      Reason: The JaCoCo plugin was not applied to the project, or the generation of XML reports was not activated (which is deactivated by default).
+  Reason: The JaCoCo plugin was not applied to the project, or the generation of XML reports was not activated (which is deactivated by default).
   
-      Possible solutions:
-        - Apply the JaCoCo plugin:
-            plugins {
-              jacoco
-            }
+  Possible solutions:
+    - Apply the JaCoCo plugin:
+        plugins {
+          jacoco
+        }
   
-        - Activate the XML report generation by setting the following property to the 'jacocoTestReport' task:
-            tasks.jacocoTestReport {
-              reports.xml.required.set(true)
-            }
-        
-        - Suppress this error by ignoring missing JaCoCo report files:
-            bitbucketCodeCoverage {
-              jacoco {
-                skipOnMissingJacocoXmlCoverageReports.set(true)
-              }
-            }
-        """.trimIndent()
+    - Activate the XML report generation by setting the following property to the 'jacocoTestReport' task:
+        tasks.jacocoTestReport {
+          reports.xml.required.set(true)
+        }
+    
+    - Suppress this error by ignoring missing JaCoCo report files:
+        bitbucketCodeCoverage {
+          jacoco {
+            skipOnMissingJacocoXmlCoverageReports.set(true)
+          }
+        }
+    """.trimIndent()
   }
 
   // -- Properties -------------------------------------------------------------------------------------------------- //
