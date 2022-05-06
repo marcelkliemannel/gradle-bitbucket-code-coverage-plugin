@@ -70,7 +70,7 @@ open class PublishCodeCoverageToBitbucketExtension @Inject constructor(objects: 
   val bitbucketProjectKey: Property<String>
 
   /**
-   * A repository slug.
+   * The slug of a repository in a Bitbucket project.
    *
    * Must be set in conjunction with [bitbucketProjectKey].
    */

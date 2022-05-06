@@ -66,10 +66,12 @@ class BitbucketCodeCoveragePlugin : Plugin<Project> {
 
       // Set the default source files search dirs to all source directories of
       // this project.
-      val allSourceDirs = project.extensions.findByType(JavaPluginExtension::class.java)?.sourceSets?.flatMap { sourceSet ->
-        sourceSet.allSource.sourceDirectories
-      }?.toList()
-      task.sourceFilesSearchDirs.from(allSourceDirs)
+      if (extension.jacoco.sourceFilesSearchDirs.isEmpty) {
+        val allSourceDirs = project.extensions.findByType(JavaPluginExtension::class.java)?.sourceSets?.flatMap { sourceSet ->
+          sourceSet.allSource.sourceDirectories
+        }?.toList()
+        task.sourceFilesSearchDirs.from(allSourceDirs)
+      }
     }
   }
 
