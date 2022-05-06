@@ -94,6 +94,9 @@ open class PublishCodeCoverageToBitbucketExtension @Inject constructor(objects: 
     bitbucketProjectKey = objects.property(String::class.java)
     bitbucketRepositorySlug = objects.property(String::class.java)
     jacoco = objects.newInstance(PublishJacocoCodeCoverageToBitbucketExtension::class.java)
+
+    // Set default values
+    bitbucketTimeout.convention(Duration.ofSeconds(30))
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
