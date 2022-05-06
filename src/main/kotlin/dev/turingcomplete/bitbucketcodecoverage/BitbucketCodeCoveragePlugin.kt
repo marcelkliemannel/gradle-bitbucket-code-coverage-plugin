@@ -8,9 +8,15 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.gradle.util.GradleVersion
 
 class BitbucketCodeCoveragePlugin : Plugin<Project> {
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+    const val PLUGIN_ID = "dev.turingcomplete.bitbucket-code-coverage"
+  }
+
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -26,6 +32,11 @@ class BitbucketCodeCoveragePlugin : Plugin<Project> {
    * @see addPublishJacocoCodeCoverageToBitbucketTask
    */
   override fun apply(project: Project) {
+    if (GradleVersion.version(project.gradle.gradleVersion) < GradleVersion.version("7.1")) {
+      project.logger.error("The plugin '{}' requires at least Gradle 7.1.", PLUGIN_ID)
+      return
+    }
+
     val extension = project.extensions.create(PublishCodeCoverageToBitbucketExtension.EXTENSION_NAME, PublishCodeCoverageToBitbucketExtension::class.java)
 
     project.afterEvaluate {
