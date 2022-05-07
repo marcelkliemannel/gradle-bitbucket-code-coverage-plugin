@@ -231,7 +231,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
     }
     
     if (response.statusCode() !in (200..299)) {
-      throw GradleException("Bitbucket responded with the unexpected status code ${response.statusCode()} and body:\n${response.body()}")
+      throw GradleException("Failed to send code coverage to Bitbucket. Got unexpected status code ${response.statusCode()} and body:\n${response.body()}")
     }
 
     logger.info("Code coverage was sent to Bitbucket.")
