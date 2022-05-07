@@ -61,7 +61,7 @@ class PublishJacocoCodeCoverageToBitbucketTaskTest {
             .forwardOutput()
             .build()
 
-    val expectedRequests = listOf(BitbucketApiRequest("/bitbucket/rest/code-coverage/1.0/commits/12345", "POST", """
+    val expectedRequests = listOf(BitbucketApiRequest("/rest/code-coverage/1.0/commits/12345", "POST", """
       {
         "files": [
           {
@@ -74,7 +74,7 @@ class PublishJacocoCodeCoverageToBitbucketTaskTest {
           }
         ]
       }
-    """.trimIndent()), BitbucketApiRequest("/bitbucket/rest/code-coverage/1.0/commits/12345", "POST", """
+    """.trimIndent()), BitbucketApiRequest("/rest/code-coverage/1.0/commits/12345", "POST", """
       {
         "files": [
           {

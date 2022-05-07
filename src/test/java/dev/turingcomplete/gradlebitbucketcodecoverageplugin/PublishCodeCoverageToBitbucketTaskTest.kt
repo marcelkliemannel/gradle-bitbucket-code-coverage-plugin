@@ -72,7 +72,7 @@ class PublishCodeCoverageToBitbucketTaskTest {
             .build()
 
     val actualRequests = mockBitbucketServer.getReceivedRequests()
-    assertThat(actualRequests.map { it.requestPath }).allMatch { it == "/bitbucket/rest/code-coverage/1.0/projects/PROJECT_KEY/repos/project_slug/commits/98sjrmx" }
+    assertThat(actualRequests.map { it.requestPath }).allMatch { it == "/rest/code-coverage/1.0/projects/PROJECT_KEY/repos/project_slug/commits/98sjrmx" }
   }
 
   @Test

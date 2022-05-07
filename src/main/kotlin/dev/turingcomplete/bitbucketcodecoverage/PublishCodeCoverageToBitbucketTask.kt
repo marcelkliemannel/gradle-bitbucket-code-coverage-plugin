@@ -160,8 +160,8 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
    * coverage for a specific commit ID.
    *
    * The default URIs are:
-   * - `$host/bitbucket/rest/code-coverage/1.0/commits/$commitID` or
-   * - `$host/bitbucket/rest/code-coverage/1.0/projects/$projectKey/repos/$repositorySlug/commits/$commitID`.
+   * - `$host/rest/code-coverage/1.0/commits/$commitID` or
+   * - `$host/rest/code-coverage/1.0/projects/$projectKey/repos/$repositorySlug/commits/$commitID`.
    *
    * @return the full [URI] to the Bitbucket code coverage endpoint.
    */
