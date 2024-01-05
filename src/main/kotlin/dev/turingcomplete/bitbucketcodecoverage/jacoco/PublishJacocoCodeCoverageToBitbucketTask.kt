@@ -144,7 +144,10 @@ open class PublishJacocoCodeCoverageToBitbucketTask : PublishCodeCoverageToBitbu
 
     fileCodeCoverageBuilderToUnresolvedSourceFile.forEach {
       if (resolvedSourceFiles.containsKey(it.value)) {
-        fileCodeCoverages.add(it.key.build(resolvedSourceFiles[it.value]!!))
+        val coverage = it.key.build(resolvedSourceFiles[it.value]!!)
+        if (coverage.hasCoverageInfo()) {
+          fileCodeCoverages.add(coverage)
+        }
       }
       else {
         missingSourceFiles.add(it.value)

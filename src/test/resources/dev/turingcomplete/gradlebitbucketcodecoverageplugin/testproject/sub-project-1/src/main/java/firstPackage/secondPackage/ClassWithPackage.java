@@ -1,6 +1,6 @@
 package firstPackage.secondPackage;
 
-public class ClassWithPackage {
+public class ClassWithPackage implements firstPackage.secondPackage.InterfaceWithoutDefaults {
 
     public static final String STATIC_PARAM = "Static Param";
 

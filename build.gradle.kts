@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "dev.turingcomplete"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
   mavenLocal()
@@ -32,6 +32,11 @@ configure<JavaPluginExtension> {
 
 tasks.getByName<Test>("test") {
   useJUnitPlatform()
+  val tmpDir = File(buildDir, "tmp/test-tmp")
+  systemProperty("java.io.tmpdir", tmpDir)
+  doFirst {
+    tmpDir.mkdirs()
+  }
 }
 
 gradlePlugin {
