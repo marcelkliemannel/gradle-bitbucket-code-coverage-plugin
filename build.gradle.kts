@@ -3,7 +3,7 @@ plugins {
   `java-gradle-plugin`
   `maven-publish`
   kotlin("jvm") version "1.6.20"
-  id("com.gradle.plugin-publish") version "1.0.0-rc-1"
+  id("com.gradle.plugin-publish") version "1.2.1"
 }
 
 group = "dev.turingcomplete"
@@ -26,8 +26,8 @@ dependencies {
 }
 
 configure<JavaPluginExtension> {
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 }
 
 tasks.getByName<Test>("test") {
