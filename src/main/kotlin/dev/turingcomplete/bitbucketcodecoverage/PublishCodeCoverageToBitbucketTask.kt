@@ -119,6 +119,7 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
   fun publish() {
     validateTaskProperties()
     publishCodeCoverageToBitbucketApi(fileCodeCoverages.get())
+    didWork = true
   }
 
   /**
@@ -213,10 +214,10 @@ abstract class PublishCodeCoverageToBitbucketTask : DefaultTask() {
       logger.info("Sending code coverage for ${fileCodeCoverages.size} file(s) to Bitbucket...")
 
       val jsonRepresentation = createBitbucketFileCoveragesJson(fileCodeCoverages)
-      logger.debug("The following Bitbucket code coverage will be send:\n${jsonRepresentation}")
+      logger.debug("The following Bitbucket code coverage will be send:\n{}", jsonRepresentation)
 
       val request = createPublishBitbucketCodeCoverageRequest(jsonRepresentation)
-      logger.debug("Using Bitbucket URI: ${request.uri()}")
+      logger.debug("Using Bitbucket URI: {}", request.uri())
 
       createBitbucketHttpClient().send(request, BodyHandlers.ofString())
     }

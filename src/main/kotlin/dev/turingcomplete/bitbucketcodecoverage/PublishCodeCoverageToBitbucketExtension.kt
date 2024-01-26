@@ -4,6 +4,7 @@ import dev.turingcomplete.bitbucketcodecoverage.jacoco.PublishJacocoCodeCoverage
 import dev.turingcomplete.bitbucketcodecoverage.jacoco.PublishJacocoCodeCoverageToBitbucketTask
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.time.Duration
 import javax.inject.Inject
 
@@ -82,6 +83,18 @@ open class PublishCodeCoverageToBitbucketExtension @Inject constructor(objects: 
    */
   val jacoco: PublishJacocoCodeCoverageToBitbucketExtension
 
+  /**
+   * If set to true, the [PublishJacocoCodeCoverageToBitbucketTask] will only
+   * run if the [JacocoReport] tasks indicates that they actually did any work.
+   *
+   * Setting this value to false can be useful if the [JacocoReport] tasks and
+   * the [PublishJacocoCodeCoverageToBitbucketTask] task are to be executed
+   * in separate runs.
+   *
+   * The default value is true.
+   */
+  val onlyRunIfJacocoReportTasksDidWork: Property<Boolean>
+
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
@@ -94,9 +107,11 @@ open class PublishCodeCoverageToBitbucketExtension @Inject constructor(objects: 
     bitbucketProjectKey = objects.property(String::class.java)
     bitbucketRepositorySlug = objects.property(String::class.java)
     jacoco = objects.newInstance(PublishJacocoCodeCoverageToBitbucketExtension::class.java)
+    onlyRunIfJacocoReportTasksDidWork = objects.property(Boolean::class.java)
 
     // Set default values
     bitbucketTimeout.convention(Duration.ofSeconds(30))
+    onlyRunIfJacocoReportTasksDidWork.set(true)
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //

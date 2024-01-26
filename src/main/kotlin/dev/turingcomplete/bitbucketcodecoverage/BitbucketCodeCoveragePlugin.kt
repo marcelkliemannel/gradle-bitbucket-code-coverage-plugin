@@ -66,7 +66,9 @@ class BitbucketCodeCoveragePlugin : Plugin<Project> {
       // Make this task dependent on the `JacocoReport` task.
       val jacocoReportTasks = project.tasks.withType(JacocoReport::class.java)
       task.dependsOn(jacocoReportTasks)
-      task.onlyIf { jacocoReportTasks.any { task -> task.didWork } }
+      if (extension.onlyRunIfJacocoReportTasksDidWork.get()) {
+        task.onlyIf { jacocoReportTasks.any { task -> task.didWork } }
+      }
 
       // Set the default JaCoCo XML reports files to the output of the
       // `JacocoReport` tasks.

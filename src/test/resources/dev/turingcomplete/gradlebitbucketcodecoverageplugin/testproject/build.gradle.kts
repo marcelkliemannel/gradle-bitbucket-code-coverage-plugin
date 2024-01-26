@@ -5,7 +5,7 @@ import java.time.Duration
 
 plugins {
   java
-  id("dev.turingcomplete.bitbucket-code-coverage") version "1.0.0"
+  id("dev.turingcomplete.bitbucket-code-coverage") version "1.0.1"
   jacoco
 }
 

@@ -118,6 +118,8 @@ bitbucketCodeCoverage {
     skipOnMissingJacocoXmlCoverageReports.set(true) // Optional
     sourceFilesSearchDirs.setFrom(project.files(File("alternate", "search-dir"))) // Optional
   }
+    
+  onlyRunIfJacocoReportTaskDidWork.set(false) // Optional
 }
 ```
 
