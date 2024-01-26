@@ -19,6 +19,7 @@ object TestProject {
                                           "build.gradle.kts",
                                           "$SUB_PROJECT_1_NAME/build.gradle.kts",
                                           "$SUB_PROJECT_1_NAME/src/main/java/firstPackage/secondPackage/ClassWithPackage.java",
+                                          "$SUB_PROJECT_1_NAME/src/main/java/firstPackage/secondPackage/InterfaceWithoutDefaults.java",
                                           "$SUB_PROJECT_1_NAME/src/main/java/ClassWithoutPackage.java",
                                           "$SUB_PROJECT_1_NAME/src/test/java/FirstProjectCoverageTest.java",
                                           "$SUB_PROJECT_2_NAME/build.gradle.kts",
