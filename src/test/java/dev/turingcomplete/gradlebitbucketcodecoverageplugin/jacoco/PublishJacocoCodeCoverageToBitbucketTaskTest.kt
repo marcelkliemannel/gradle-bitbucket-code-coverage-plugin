@@ -57,7 +57,7 @@ class PublishJacocoCodeCoverageToBitbucketTaskTest {
     """.trimIndent())
 
     val result = gradleRunner
-            .withArguments(PublishJacocoCodeCoverageToBitbucketTask.TASK_NAME, "--stacktrace")
+            .withArguments(PublishJacocoCodeCoverageToBitbucketTask.TASK_NAME, "--stacktrace", "--info")
             .forwardOutput()
             .build()
 

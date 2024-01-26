@@ -11,7 +11,7 @@ __The plugin is available in the [Gradle Plugin Portal](https://plugins.gradle.o
 Using the [plugins DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block):
 ```kotlin
 plugins { 
-    id("dev.turingcomplete.bitbucket-code-coverage") version "1.0.0"
+    id("dev.turingcomplete.bitbucket-code-coverage") version "1.0.1"
 }
 ```
 
@@ -24,7 +24,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("dev.turingcomplete.bitbucket-code-coverage:1.0.0")
+        classpath("dev.turingcomplete.bitbucket-code-coverage:1.0.1")
     }
 }
 
@@ -40,7 +40,7 @@ The following code must be present at least in the `build.gradle.kts` for the pl
 ```kotlin
 plugins {
     jacoco
-    id("dev.turingcomplete.bitbucket-code-coverage") version "1.0.0"
+    id("dev.turingcomplete.bitbucket-code-coverage") version "1.0.1"
 }
 
 bitbucketCodeCoverage {

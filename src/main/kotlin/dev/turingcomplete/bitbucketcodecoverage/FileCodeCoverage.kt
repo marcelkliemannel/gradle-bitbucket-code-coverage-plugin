@@ -33,6 +33,10 @@ class FileCodeCoverage(val sourceFile: File,
     return "C:${fullyCoveredLines.joinToString(",")};P:${partiallyCoveredLines.joinToString(",")};U:${uncoveredLines.joinToString(",")}"
   }
 
+  fun hasCoverageInfo(): Boolean {
+    return fullyCoveredLines.isNotEmpty() || partiallyCoveredLines.isNotEmpty() || uncoveredLines.isNotEmpty()
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 

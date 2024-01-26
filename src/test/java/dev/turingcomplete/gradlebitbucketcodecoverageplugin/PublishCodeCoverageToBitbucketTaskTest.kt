@@ -119,18 +119,24 @@ class PublishCodeCoverageToBitbucketTaskTest {
   }
 
   @ParameterizedTest
-  @CsvSource(value = ["|||C:;P:;U:", "1|2|3|C:1;P:2;U:3", "1,2|3,4,5|6,7,8,9|C:1,2;P:3,4,5;U:6,7,8,9"], delimiter = '|')
+  @CsvSource(value = [
+    "|||C:;P:;U:|false",
+    "1|2|3|C:1;P:2;U:3|true",
+    "1,2|3,4,5|6,7,8,9|C:1,2;P:3,4,5;U:6,7,8,9|true"
+  ], delimiter = '|')
   fun `Test toBitbucketCodeCoverage`(fullyCoveredLines: String?,
                                      partiallyCoveredLines: String?,
                                      uncoveredCoveredLines: String?,
-                                     expectedBitbucketCoverage: String) {
+                                     expectedBitbucketCoverage: String,
+                                     expectedHasCoverageInfo: Boolean) {
+    val coverage = FileCodeCoverage(
+            File(""),
+            fullyCoveredLines?.split(",")?.map { it.toInt() }?.toSet() ?: emptySet(),
+            partiallyCoveredLines?.split(",")?.map { it.toInt() }?.toSet() ?: emptySet(),
+            uncoveredCoveredLines?.split(",")?.map { it.toInt() }?.toSet() ?: emptySet())
 
-    assertThat(FileCodeCoverage(File(""),
-                                fullyCoveredLines?.split(",")?.map { it.toInt() }?.toSet() ?: emptySet(),
-                                partiallyCoveredLines?.split(",")?.map { it.toInt() }?.toSet() ?: emptySet(),
-                                uncoveredCoveredLines?.split(",")?.map { it.toInt() }?.toSet() ?: emptySet())
-                       .toBitbucketCodeCoverage())
-            .isEqualTo(expectedBitbucketCoverage)
+    assertThat(coverage.toBitbucketCodeCoverage()).isEqualTo(expectedBitbucketCoverage)
+    assertThat(coverage.hasCoverageInfo()).isEqualTo(expectedHasCoverageInfo)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
